@@ -24,7 +24,7 @@ Given a list of ordered comments references
 ]
 ```
 
-Should be rendred as HTML
+Should be rendered as HTML
 
 ```html
 <ul>
