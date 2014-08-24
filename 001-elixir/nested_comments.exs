@@ -1,3 +1,4 @@
+# run it with `elixir 001-elixir/nested_comments.exs`
 
 defmodule NestedComments do
   def render(comments) do
