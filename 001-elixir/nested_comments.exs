@@ -38,22 +38,22 @@ defmodule NestedComments do
   end
 
   def structure(comments) do
-    {_, ul} = structure(comments, [], nil); {:ul, ul}
+    {_, ul} = structure(comments, []); {:ul, ul}
   end
 
-  defp structure(comments, structured, parent_id) do
+  defp structure(comments, structured) do
     case comments do
       [] ->
         {[], Enum.reverse(structured)}
-      [[_id, ^parent_id, message] | []] ->
-        {[], Enum.reverse([{:li, message} | structured])}
-      [[_id, ^parent_id, message], next = [_, ^parent_id, _] | comments] ->
-        structure([next|comments], [{:li, message} | structured], parent_id)
-      [[id, _parent_id, message], next = [_, id, _] | comments] ->
-        {comments, ul} = structure([next|comments], [], id)
-        structure(comments, [{:li, message, {:ul, ul}} | structured], parent_id)
-      [[_id, _parent_id, message], next = [_, _, _] | comments] ->
+      [[_, parent_id, message], next = [_, parent_id, _] | comments] ->
+        structure([next|comments], [{:li, message} | structured])
+      [[id, _, message], next = [_, id, _] | comments] ->
+        {comments, ul} = structure([next|comments], [])
+        structure(comments, [{:li, message, {:ul, ul}} | structured])
+      [[_, _, message], next = [_, _, _] | comments] ->
         {[next|comments], Enum.reverse([{:li, message} | structured])}
+      [[_, _, message] | []] ->
+        {[], Enum.reverse([{:li, message} | structured])}
     end
   end
 end
