@@ -1,25 +1,39 @@
 
 defmodule NestedComments do
   def render(comments) do
-    render(structure(comments), 0)
+    render_structure(structure(comments))
   end
 
-  defp render({:ul, comments}, level) do
-    String.duplicate(" ", level*2) <> "<ul>\n" <>
-    render(comments, level+1) <>
-    String.duplicate(" ", level*2) <> "</ul>\n"
+  defp render_structure({:ul, comments}) do
+    """
+    <ul>
+    #{render_structure(comments) |> indent}
+    </ul>
+    """
   end
-  defp render([{:li, comment}|comments], level) do
-    String.duplicate(" ", level*2) <> "<li>" <> comment <> "</li>\n" <> render(comments, level)
+  defp render_structure([{:li, comment}|comments]) do
+    """
+    <li>#{comment}</li>
+    #{render_structure(comments)}
+    """
   end
-  defp render([{:li, comment, ul = {:ul, _}}|comments], level) do
-    String.duplicate(" ", level*2) <> "<li>" <> comment <> "\n" <>
-    render(ul, level + 1) <>
-    String.duplicate(" ", level*2) <> "</li>\n" <>
-    render(comments, level)
+  defp render_structure([{:li, comment, ul = {:ul, _}}|comments]) do
+    """
+    <li>#{comment}
+    #{render_structure(ul) |> indent}
+    </li>
+    #{render_structure(comments)}
+    """
   end
-  defp render([], _) do
+  defp render_structure([]) do
     ""
+  end
+
+  defp indent(content) do
+    content
+      |> String.split("\n", trim: true)
+      |> Enum.map(&("  " <> &1))
+      |> Enum.join("\n")
   end
 
   def structure(comments) do
@@ -37,7 +51,7 @@ defmodule NestedComments do
       [[id, _parent_id, message], next = [_, id, _] | comments] ->
         {comments, ul} = structure([next|comments], [], id)
         structure(comments, [{:li, message, {:ul, ul}} | structured], parent_id)
-      [[id, _parent_id, message], next = [_, _, _] | comments] ->
+      [[_id, _parent_id, message], next = [_, _, _] | comments] ->
         {[next|comments], Enum.reverse([{:li, message} | structured])}
     end
   end
