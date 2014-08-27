@@ -61,7 +61,7 @@ end
 
 ExUnit.start
 
-defmodule AssertionTest do
+defmodule NestedCommentsTest do
   use ExUnit.Case, async: true
 
   test "flat list" do
