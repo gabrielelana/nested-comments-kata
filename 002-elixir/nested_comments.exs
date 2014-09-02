@@ -25,7 +25,7 @@ defmodule NestedComments do
     ""
   end
   def render(comments) do
-    render(structure(comments))
+    comments |> structure |> render
   end
 
   def structure(comments) do
